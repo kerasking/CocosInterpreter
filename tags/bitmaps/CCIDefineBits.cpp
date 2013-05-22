@@ -39,7 +39,11 @@ void CCIDefineBits::loadImageData(UI8 * imageData){
     
     CCImage::EImageFormat eImageFormat = CCImage::kFmtJpg;
     CCImage image;
-    image.initWithImageData((void*)imageData, tagLength-2, eImageFormat);
+    
+    int start = this->findJpegStart(imageData);
+    imageData +=start;
+    
+    image.initWithImageData((void*)imageData, imageSize-start, eImageFormat);
     
     this->texture2d = new CCTexture2D();
     this->texture2d->initWithImage(&image);
@@ -69,5 +73,29 @@ void CCIDefineBits::decodeInfo(UI8* imageData){
             index += length - 2;
         }
     }
+}
+int CCIDefineBits::findJpegStart(UI8 *imageData){
+    int length = imageSize;
+    int i = 0;
+    
+    // "Before version 8 of the SWF file format, SWF files could contain an erroneous header
+    //  of 0xFF, 0xD9, 0xFF, 0xD8 before the JPEG SOI marker" (Page 147)
+    //
+    if (length >= 6) {
+        while (i<length) {
+            if (imageData[i] == 0xFF && imageData[i+1] == 0xD9 && imageData[i+2] == 0xFF && imageData[i+3] == 0xD8) {
+                if (imageData[i+4] == 0xFF && imageData[i+5] == 0xD8) {
+                    i += 4;
+                } else {
+                    i += 2;
+                }
+                return i;
+            }
+            i++;
+        }
+        
+    }
+    
+    return 0;
 }
 NS_CC_EXT_END

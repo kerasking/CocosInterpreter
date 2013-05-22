@@ -20,6 +20,7 @@ public:
 protected:
     virtual void loadImageData(UI8* imageData);
     virtual void decodeInfo(UI8* imageData);
+    virtual int findJpegStart(UI8* imageData);
     int imageSize = 0;
 };
 

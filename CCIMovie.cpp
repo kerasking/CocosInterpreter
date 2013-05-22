@@ -34,6 +34,8 @@ CCIMovie * CCIMovie::decodeFromFile(std::string filename){
         delete[] swfdata;
         return NULL;
     }
+    
+    
     CCIBufferReader bufferReader;
     bufferReader.setData(swfdata, fileSize);
     delete[] swfdata;
