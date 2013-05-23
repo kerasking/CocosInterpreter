@@ -42,10 +42,12 @@ CCIMatrix::CCIMatrix(CCIBufferReader *reader){
     reader->clearBits();
 }
 float CCIMatrix::getScaleX(){
-    return sqrt(a*a+b*b);
+    //return sqrt(a*a+b*b);
+    return sqrt(a*a+b*b)*(sin(a)<0?-1:1);
 }
 float CCIMatrix::getScaleY(){
-    return sqrt(c*c+d*d);
+    //return sqrt(c*c+d*d);
+    return sqrt(c*c+d*d)*(sin(d)<0?-1:1);
 }
 float CCIMatrix::getSkewX(){
     float skewX = CC_RADIANS_TO_DEGREES(atan2(b, d));
@@ -53,7 +55,8 @@ float CCIMatrix::getSkewX(){
 }
 float CCIMatrix::getSkewY(){
     float skewY = CC_RADIANS_TO_DEGREES(atan2(c, a));
-    return -skewY;
+    //FIXME
+    return skewY;
 }
 int CCIMatrix::getTranslateX(){
     return this->TranslateX/20;

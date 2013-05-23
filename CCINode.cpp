@@ -113,7 +113,7 @@ void CCINode::loadImages(){
             
             CCNode * shape = CCNode::create();
             //CCNode * shape = CCLayerColor::create(ccc4(200,0,0,100));
-            //shape->ignoreAnchorPointForPosition(false);
+            shape->ignoreAnchorPointForPosition(false);
             shape->setContentSize(bounds->getSize());
             
             shape->setAnchorPoint(bounds->getAnchorPoint());
@@ -248,25 +248,24 @@ void CCINode::showFrame(){
                     
                     node->setPosition(this->swfMovie->getHeader()->getBounds()->convertToCCSpace(x, y));
                     //restore
+                    float scaleX = 1.0;
+                    float scaleY = 1.0;
                     node->setScaleX(1);
                     node->setScaleY(1);
                     node->setSkewX(0);
                     node->setSkewY(0);
                     
                     if (matrix->HasScale) {
-                        node->setScaleX(matrix->getScaleX());
-                        node->setScaleY(matrix->getScaleY());
+                        scaleX = matrix->getScaleX();
+                        scaleY = matrix->getScaleY();
+                        node->setScaleX(scaleX);
+                        node->setScaleY(scaleY);
                     }
                     if (matrix->HasRotate) {
                         float skewX = matrix->getSkewX();
                         float skewY = matrix->getSkewY();
                         
-                        node->setSkewX(skewX);
-                        node->setSkewY(skewY);
-                        
-                        //fix skew
-                        node->setScaleX(node->getScaleX()*cos(CC_DEGREES_TO_RADIANS(-skewX)));
-                        node->setScaleY(node->getScaleY()*cos(CC_DEGREES_TO_RADIANS(skewY)));
+                        this->applySkew(node, skewX, skewY);
                     }
                     
                 }
@@ -365,7 +364,25 @@ void CCINode::applyColorTransform(cocos2d::CCNode *node, ccColor4B colorTransfor
         }
     }
 }
-
+void CCINode::applySkew(cocos2d::CCNode *node, float skewX, float skewY){
+    
+    if (skewX*skewY<0) {
+        skewX = -skewX;
+        skewY = skewY;
+    }else{
+        skewX = skewX;
+        skewY = -skewY;
+    }
+    skewX -=node->getScaleY()<0?180:0;
+    skewY +=node->getScaleX()<0?180:0;
+    
+    node->setSkewX(skewX);
+    node->setSkewY(skewY);
+    
+    //fix skew
+    node->setScaleX(node->getScaleX()*cos(CC_DEGREES_TO_RADIANS(-skewX)));
+    node->setScaleY(node->getScaleY()*cos(CC_DEGREES_TO_RADIANS(skewY)));
+}
 
 void CCINode::fillNodeWithStyle(CCIFillStyleArray * fillStyles,CCNode * node,CCIRect * nodeBounds){
     if (fillStyles->FillStyles.size()>0) {
@@ -395,12 +412,8 @@ void CCINode::fillNodeWithStyle(CCIFillStyleArray * fillStyles,CCNode * node,CCI
                     if (spriteMatrix->HasRotate) {
                         float skewX = spriteMatrix->getSkewX();
                         float skewY = spriteMatrix->getSkewY();
-                        sprite->setSkewX(skewX);
-                        sprite->setSkewY(skewY);
                         
-                        //fix skew
-                        sprite->setScaleX(sprite->getScaleX()*cos(CC_DEGREES_TO_RADIANS(-skewX)));
-                        sprite->setScaleY(sprite->getScaleY()*cos(CC_DEGREES_TO_RADIANS(skewY)));
+                        this->applySkew(sprite, skewX, skewY);
                     }
                     node->addChild(sprite);
                 }
@@ -408,6 +421,7 @@ void CCINode::fillNodeWithStyle(CCIFillStyleArray * fillStyles,CCNode * node,CCI
         }
     }
 }
+
 void CCINode::gotoAndPlay(std::string frameFlag){
     if (!isPlaying) {
         currentFrame = 0;
