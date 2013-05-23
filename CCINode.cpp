@@ -265,7 +265,7 @@ void CCINode::showFrame(){
                         float skewX = matrix->getSkewX();
                         float skewY = matrix->getSkewY();
                         
-                        this->applySkew(node, skewX, skewY);
+                        this->applySkew(node, skewX, skewY,false);
                     }
                     
                 }
@@ -364,17 +364,43 @@ void CCINode::applyColorTransform(cocos2d::CCNode *node, ccColor4B colorTransfor
         }
     }
 }
-void CCINode::applySkew(cocos2d::CCNode *node, float skewX, float skewY){
+//isInner indicate if this is a sprite
+void CCINode::applySkew(cocos2d::CCNode *node, float skewX, float skewY,bool isInner){
     
+    /*
     if (skewX*skewY<0) {
         skewX = -skewX;
         skewY = skewY;
     }else{
         skewX = skewX;
         skewY = -skewY;
+    }*/
+    float scaleX = node->getScaleX();
+    float scaleY = node->getScaleY();
+    
+    bool isDiff =(scaleX>0&&scaleY<0)||(scaleX<0&&scaleY>0);
+    
+    if (isDiff) {
+        skewX = -skewX;
+        skewY = skewY;
+        
+        
+    }else{
+        skewX = skewX;
+        skewY = -skewY;
+        
+        
+        
     }
-    skewX -=node->getScaleY()<0?180:0;
-    skewY +=node->getScaleX()<0?180:0;
+    if (isInner) {
+        skewX -=scaleY>0?180:0;
+        skewY +=scaleX>0?180:0;
+    }else{
+        skewX -=scaleY<0?180:0;
+        skewY +=scaleX<0?180:0;
+    }
+    
+    
     
     node->setSkewX(skewX);
     node->setSkewY(skewY);
@@ -413,7 +439,7 @@ void CCINode::fillNodeWithStyle(CCIFillStyleArray * fillStyles,CCNode * node,CCI
                         float skewX = spriteMatrix->getSkewX();
                         float skewY = spriteMatrix->getSkewY();
                         
-                        this->applySkew(sprite, skewX, skewY);
+                        this->applySkew(sprite, skewX, skewY,true);
                     }
                     node->addChild(sprite);
                 }

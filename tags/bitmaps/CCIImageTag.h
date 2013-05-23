@@ -29,6 +29,8 @@ protected:
     int imageSize;
     int width;
     int height;
+
+    
     
     virtual void loadImageData(UI8* imageData);
     

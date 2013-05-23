@@ -68,7 +68,7 @@ private:
     bool initWithTags(std::vector<CCIMovieTag *> tags,CCIMovie * swfMovie,CCDictionary * nodes);
     
     void applyColorTransform(CCNode * node,ccColor4B colorTransform);
-    void applySkew(CCNode * node,float skewX,float skewY);
+    void applySkew(CCNode * node,float skewX,float skewY,bool isInner);
 
 public:
     static CCINode* create(std::string cci_filename);

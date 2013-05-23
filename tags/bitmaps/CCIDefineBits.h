@@ -22,6 +22,8 @@ protected:
     virtual void decodeInfo(UI8* imageData);
     virtual int findJpegStart(UI8* imageData);
     int imageSize = 0;
+    
+    int swfVersion;
 };
 
 NS_CC_EXT_END

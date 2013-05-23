@@ -13,6 +13,7 @@ NS_CC_EXT_BEGIN
 bool CCIImageTag::initWithReader(cocos2d::extension::CCIBufferReader *reader, int tagType, int tagLength){
     CCIMovieTag::initWithReader(reader, tagType, tagLength);
     this->characterID = reader->readUI16();
+    
     return true;
 }
 void CCIImageTag::loadImageData(UI8* imageData){

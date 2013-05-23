@@ -26,8 +26,10 @@
 
 NS_CC_EXT_BEGIN
 bool CCIDefineBits::initWithReader(cocos2d::extension::CCIBufferReader *reader, int tagType, int tagLength){
-    
     CCIImageTag::initWithReader(reader, tagType, tagLength);
+    
+    this->swfVersion = reader->version;
+    
     imageSize = tagLength-2;
     UI8 *imageData = reader->readBytes(imageSize);
     this->loadImageData(imageData);
@@ -78,9 +80,13 @@ int CCIDefineBits::findJpegStart(UI8 *imageData){
     int length = imageSize;
     int i = 0;
     
+    
     // "Before version 8 of the SWF file format, SWF files could contain an erroneous header
     //  of 0xFF, 0xD9, 0xFF, 0xD8 before the JPEG SOI marker" (Page 147)
     //
+    if (this->swfVersion>=8) {
+        return 0;
+    }
     if (length >= 6) {
         while (i<length) {
             if (imageData[i] == 0xFF && imageData[i+1] == 0xD9 && imageData[i+2] == 0xFF && imageData[i+3] == 0xD8) {
